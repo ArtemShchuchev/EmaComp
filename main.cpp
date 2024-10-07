@@ -12,6 +12,7 @@ using namespace std;
  * The function accepts STRING_ARRAY grid as parameter.
  */
 
+// Нужно поправить эту функцию, в конце луча не обязательно наличие 'G'!
 static int findRadiusCross(const vector<string>& grid, const int idxLine, const int idxRow, const int maxRadius) {
     int radius(-1);
 
@@ -82,7 +83,9 @@ static int twoPluses(vector<string> grid) {
     int minSize(min(sizeRow, sizeLine));
     int maxCrossing(minSize % 2 ? minSize : minSize - 1);
 
-    CrossPoint cp[2];
+    CrossPoint cp[2]{};
+    //cp[0] = { 0,0,0 };
+    //cp[1] = { 0,0,0 };
     int numPoint(0);
 
     int radius(maxCrossing / 2);
@@ -166,8 +169,12 @@ static int twoPluses(vector<string> grid) {
 
 
     //size = findPlus(grid, maxCrossing/2, maxCrossing/2, maxCrossing);
-    int square = (cp[0].radius * 4 + 1) * (cp[1].radius * 4 + 1);
-    return square;
+    int square1 = cp[0].radius ? cp[0].radius * 4 + 1 : 0;
+    int square2 = cp[1].radius ? cp[1].radius * 4 + 1 : 0;
+
+    cout << square1 << ' ' << square2 << endl;
+
+    return square1 * square2;
 }
 
 
