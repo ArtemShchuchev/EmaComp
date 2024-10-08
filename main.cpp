@@ -12,8 +12,8 @@ using namespace std;
  * The function accepts STRING_ARRAY grid as parameter.
  */
 
-// Нужно поправить эту функцию, в конце луча не обязательно наличие 'G'!
-static int findRadiusCross(const vector<string>& grid, const int idxLine, const int idxRow, const int maxRadius) {
+
+static int findRadiusCross(const vector<string>& grid, const unsigned long long idxLine, const unsigned long long idxRow, const int maxRadius) {
     int radius(-1);
 
     if (grid[idxLine][idxRow] == 'G') {
@@ -26,26 +26,27 @@ static int findRadiusCross(const vector<string>& grid, const int idxLine, const 
             else if (grid[idxLine][idxRow - radius] != 'G') break;
         }
 
-        int maxCrossing(maxRadius * 2 + 1);
         if (radius > maxRadius) {
             bool thereIsSpace(true);
+            int maxCrossing(maxRadius * 2 + 1);
+
             if (maxCrossing < grid.size()) {
                 if (idxLine - radius >= 0) {
-                    if (grid[idxLine - radius][idxRow] != 'G') thereIsSpace = false;
+                    if (grid[idxLine - radius][idxRow] == 'O') thereIsSpace = false;
                 }
 
                 if (thereIsSpace && idxLine + radius < grid.size()) {
-                    if (grid[idxLine + radius][idxRow] != 'G') thereIsSpace = false;
+                    if (grid[idxLine + radius][idxRow] == 'O') thereIsSpace = false;
                 }
             }
 
             if (thereIsSpace && maxCrossing < grid[0].size()) {
                 if (idxRow + radius < grid[0].size()) {
-                    if (grid[idxLine][idxRow + radius] != 'G') thereIsSpace = false;
+                    if (grid[idxLine][idxRow + radius] == 'O') thereIsSpace = false;
                 }
 
                 if (thereIsSpace && idxRow - radius >= 0) {
-                    if (grid[idxLine][idxRow - radius] != 'G') thereIsSpace = false;
+                    if (grid[idxLine][idxRow - radius] == 'O') thereIsSpace = false;
                 }
             }
 
@@ -77,8 +78,8 @@ static void crossFill(vector<string>& grid, const CrossPoint cp) {
 }
 
 static int twoPluses(vector<string> grid) {
-    int sizeRow(grid[0].size());
-    int sizeLine(grid.size());
+    int sizeRow(static_cast<int>(grid[0].size()));
+    int sizeLine(static_cast<int>(grid.size()));
 
     int minSize(min(sizeRow, sizeLine));
     int maxCrossing(minSize % 2 ? minSize : minSize - 1);
