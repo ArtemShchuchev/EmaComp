@@ -21,36 +21,45 @@ static int findRadiusCross(const vector<string>& grid, const unsigned long long 
 
         while (++radius <= maxRadius) {
             if (grid[idxLine - radius][idxRow] != 'G') break;
-            else if (grid[idxLine][idxRow + radius] != 'G') break;
-            else if (grid[idxLine + radius][idxRow] != 'G') break;
-            else if (grid[idxLine][idxRow - radius] != 'G') break;
+            if (grid[idxLine][idxRow + radius] != 'G') break;
+            if (grid[idxLine + radius][idxRow] != 'G') break;
+            if (grid[idxLine][idxRow - radius] != 'G') break;
         }
 
-        if (radius > maxRadius) {
-            bool thereIsSpace(true);
-            int maxCrossing(maxRadius * 2 + 1);
-
-            if (maxCrossing < grid.size()) {
-                if (idxLine - radius >= 0) {
-                    if (grid[idxLine - radius][idxRow] == 'O') thereIsSpace = false;
-                }
-
-                if (thereIsSpace && idxLine + radius < grid.size()) {
-                    if (grid[idxLine + radius][idxRow] == 'O') thereIsSpace = false;
+        while (radius > maxRadius) {
+            long long up(idxLine - radius);
+            if (up >= 0) {
+                if (grid[up][idxRow] == 'O') {
+                    --radius;
+                    continue;
                 }
             }
 
-            if (thereIsSpace && maxCrossing < grid[0].size()) {
-                if (idxRow + radius < grid[0].size()) {
-                    if (grid[idxLine][idxRow + radius] == 'O') thereIsSpace = false;
-                }
-
-                if (thereIsSpace && idxRow - radius >= 0) {
-                    if (grid[idxLine][idxRow - radius] == 'O') thereIsSpace = false;
+            unsigned long long down(idxLine + radius);
+            if (down < grid.size()) {
+                if (grid[down][idxRow] == 'O') {
+                    --radius;
+                    continue;
                 }
             }
 
-            if (thereIsSpace == false) --radius;
+            unsigned long long right(idxRow + radius);
+            if (right < grid[0].size()) {
+                if (grid[idxLine][right] == 'O') {
+                    --radius;
+                    continue;
+                }
+            }
+
+            long long left(idxRow - radius);
+            if (left >= 0) {
+                if (grid[idxLine][left] == 'O') {
+                    --radius;
+                    continue;
+                }
+            }
+
+            break;
         }
 
         --radius;
@@ -84,10 +93,10 @@ static int twoPluses(vector<string> grid) {
     int minSize(min(sizeRow, sizeLine));
     int maxCrossing(minSize % 2 ? minSize : minSize - 1);
 
+    int numPoint(0);
     CrossPoint cp[2]{};
     //cp[0] = { 0,0,0 };
     //cp[1] = { 0,0,0 };
-    int numPoint(0);
 
     int radius(maxCrossing / 2);
     while (radius >= 0) {
@@ -134,6 +143,7 @@ static int twoPluses(vector<string> grid) {
             }
         }
         if (numPoint == 2) break;
+
         // vertikal
         ++lMin;
         --lMax;
