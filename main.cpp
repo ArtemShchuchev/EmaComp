@@ -95,17 +95,10 @@ static int twoPluses(vector<string> grid) {
 
     int numPoint(0);
     CrossPoint cp[2]{};
-    //cp[0] = { 0,0,0 };
-    //cp[1] = { 0,0,0 };
-
     int radius(maxCrossing / 2);
-    while (radius >= 0) {
-        int tempRad(0);
-        int lMin = radius;
-        int rMin = radius;
-        int lMax = sizeLine - lMin - 1;
-        int rMax = sizeRow - rMin - 1;
+    int tempRad(0);
 
+    while (radius >= 0) {
         if (cp[numPoint].radius >= radius) {
             if (numPoint) numPoint = 2;
             else {
@@ -115,6 +108,11 @@ static int twoPluses(vector<string> grid) {
 
             if (numPoint == 2) break;
         }
+
+        int lMin = radius;
+        int rMin = radius;
+        int lMax = sizeLine - lMin - 1;
+        int rMax = sizeRow - rMin - 1;
 
         // horizontal
         for (int r(rMin); r <= rMax; ++r) {
