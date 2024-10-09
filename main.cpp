@@ -94,7 +94,7 @@ static int twoPluses(vector<string> grid) {
     int maxCrossing(minSize % 2 ? minSize : minSize - 1);
 
     int numPoint(0);
-    CrossPoint cp[2]{};
+    CrossPoint cp[2]{ {-1,-1,-1}, {-1,-1,-1} };
     int radius(maxCrossing / 2);
     int tempRad(0);
 
