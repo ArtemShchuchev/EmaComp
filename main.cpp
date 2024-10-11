@@ -17,49 +17,13 @@ static int findRadiusCross(const vector<string>& grid, const unsigned long long 
     int radius(-1);
 
     if (grid[idxLine][idxRow] == 'G') {
-        radius = 0;
+        ++radius;
 
         while (++radius <= maxRadius) {
             if (grid[idxLine - radius][idxRow] != 'G') break;
             if (grid[idxLine][idxRow + radius] != 'G') break;
             if (grid[idxLine + radius][idxRow] != 'G') break;
             if (grid[idxLine][idxRow - radius] != 'G') break;
-        }
-
-        while (radius > maxRadius) {
-            long long up(idxLine - radius);
-            if (up >= 0) {
-                if (grid[up][idxRow] == 'O') {
-                    --radius;
-                    continue;
-                }
-            }
-
-            unsigned long long down(idxLine + radius);
-            if (down < grid.size()) {
-                if (grid[down][idxRow] == 'O') {
-                    --radius;
-                    continue;
-                }
-            }
-
-            unsigned long long right(idxRow + radius);
-            if (right < grid[0].size()) {
-                if (grid[idxLine][right] == 'O') {
-                    --radius;
-                    continue;
-                }
-            }
-
-            long long left(idxRow - radius);
-            if (left >= 0) {
-                if (grid[idxLine][left] == 'O') {
-                    --radius;
-                    continue;
-                }
-            }
-
-            break;
         }
 
         --radius;
@@ -151,7 +115,7 @@ static int twoPluses(vector<string> grid) {
     int square1 = cp[0].radius * 4 + 1;
     int square2 = cp[1].radius * 4 + 1;
 
-    //cout << square1 << " * " << square2 << " = ";
+    cout << square1 << " * " << square2 << " = ";
 
     return square1 * square2;
 }
@@ -166,19 +130,19 @@ int main()
 
     /*
     vector<string> grid{
-        "GGGGGG",
-        "GBBBGB",
-        "GGGGGG",
-        "GGBBGB",
-        "GGGGGG"
-    };
-    vector<string> grid{
         "BGBBGB",
         "GGGGGG",
         "BGBBGB",
         "GGGGGG",
         "BGBBGB",
         "BGBBGB"
+    };
+    vector<string> grid{
+        "GGGGGG",
+        "GBBBGB",
+        "GGGGGG",
+        "GGBBGB",
+        "GGGGGG"
     };
     */
     vector<string> grid{ //81
