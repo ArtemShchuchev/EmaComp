@@ -115,7 +115,7 @@ static int twoPluses(vector<string> grid) {
     int square1 = cp[0].radius * 4 + 1;
     int square2 = cp[1].radius * 4 + 1;
 
-    cout << square1 << " * " << square2 << " = ";
+    std::cout << square1 << " * " << square2 << " = ";
 
     return square1 * square2;
 }
@@ -158,7 +158,7 @@ int main()
 
     int result = twoPluses(grid);
 
-    cout << result << "\n";
+    std::cout << result << "\n";
 
     return 0;
 }
