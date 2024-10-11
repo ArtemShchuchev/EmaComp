@@ -114,74 +114,44 @@ static int twoPluses(vector<string> grid) {
         int lMax = sizeLine - lMin - 1;
         int rMax = sizeRow - rMin - 1;
 
+        vector<pair<int, int>> coords;
+
         // horizontal
         for (int r(rMin); r <= rMax; ++r) {
-            tempRad = findRadiusCross(grid, lMin, r, radius);
-            if (tempRad >= 0) {
-                if (tempRad == radius) {
-                    cp[numPoint] = { lMin, r, tempRad };
-                    crossFill(grid, cp[numPoint]);
-                    ++numPoint;
-                }
-                else if (tempRad > cp[numPoint].radius) cp[numPoint] = { lMin, r, tempRad };
-                if (numPoint == 2) break;
-            }
-
-            if (lMin != lMax) {
-                tempRad = findRadiusCross(grid, lMax, r, radius);
-                if (tempRad >= 0) {
-                    if (tempRad == radius) {
-                        cp[numPoint] = { lMax, r, tempRad };
-                        crossFill(grid, cp[numPoint]);
-                        ++numPoint;
-                    }
-                    else if (tempRad > cp[numPoint].radius) cp[numPoint] = { lMax, r, tempRad };
-                    if (numPoint == 2) break;
-                }
-            }
+            coords.push_back({ lMin, r });
+            if (lMin != lMax) coords.push_back({ lMax, r });
         }
-        if (numPoint == 2) break;
-
         // vertikal
         ++lMin;
         --lMax;
         for (int l(lMin); l <= lMax; ++l) {
-            tempRad = findRadiusCross(grid, l, rMin, radius);
+            coords.push_back({ l, rMin });
+            if (rMin != rMax) coords.push_back({ l, rMax });
+        }
+        // find cross
+        for (const auto& [l, r] : coords) {
+            tempRad = findRadiusCross(grid, l, r, radius);
             if (tempRad >= 0) {
                 if (tempRad == radius) {
-                    cp[numPoint] = { l, rMin, tempRad };
+                    cp[numPoint] = { l, r, tempRad };
                     crossFill(grid, cp[numPoint]);
                     ++numPoint;
                 }
-                else if (tempRad > cp[numPoint].radius) cp[numPoint] = { l, rMin, tempRad };
+                else if (tempRad > cp[numPoint].radius) cp[numPoint] = { l, r, tempRad };
                 if (numPoint == 2) break;
             }
-
-            if (rMin != rMax) {
-                tempRad = findRadiusCross(grid, l, rMax, radius);
-                if (tempRad >= 0) {
-                    if (tempRad == radius) {
-                        cp[numPoint] = { l, rMax, tempRad };
-                        crossFill(grid, cp[numPoint]);
-                        ++numPoint;
-                    }
-                    else if (tempRad > cp[numPoint].radius) cp[numPoint] = { l, rMax, tempRad };
-                    if (numPoint == 2) break;
-                }
-            }
         }
+
         if (numPoint == 2) break;
 
         --radius;
     }
 
 
+    int square1 = cp[0].radius * 4 + 1;
+    int square2 = cp[1].radius * 4 + 1;
 
-    //size = findPlus(grid, maxCrossing/2, maxCrossing/2, maxCrossing);
-    int square1 = cp[0].radius ? cp[0].radius * 4 + 1 : 0;
-    int square2 = cp[1].radius ? cp[1].radius * 4 + 1 : 0;
-
-    cout << square1 << " * " << square2 << " = ";
+    //cout << square1 << " * " << square2 << " = ";
 
     return square1 * square2;
 }
@@ -194,6 +164,7 @@ int main()
     std::system("cls");
 
 
+    /*
     vector<string> grid{
         "GGGGGG",
         "GBBBGB",
@@ -201,7 +172,6 @@ int main()
         "GGBBGB",
         "GGGGGG"
     };
-    /*
     vector<string> grid{
         "BGBBGB",
         "GGGGGG",
@@ -211,6 +181,16 @@ int main()
         "BGBBGB"
     };
     */
+    vector<string> grid{ //81
+        "GGGGGGGG",
+        "GBGBGGBG",
+        "GBGBGGBG",
+        "GGGGGGGG",
+        "GBGBGGBG",
+        "GGGGGGGG",
+        "GBGBGGBG",
+        "GGGGGGGG"
+    };
 
     int result = twoPluses(grid);
 
