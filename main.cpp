@@ -161,7 +161,6 @@ int main()
         "GGBBGB",
         "GGGGGG"
     };
-    */
     vector<string> grid{ //81
         "GGGGGGGG",
         "GBGBGGBG",
@@ -171,6 +170,21 @@ int main()
         "GGGGGGGG",
         "GBGBGGBG",
         "GGGGGGGG"
+    };
+    */
+    vector<string> grid{ //81
+        "GGGGGGGGGGGG",
+        "GBGGBBBBBBBG",
+        "GBGGBBBBBBBG",
+        "GGGGGGGGGGGG",
+        "GGGGGGGGGGGG",
+        "GGGGGGGGGGGG",
+        "GGGGGGGGGGGG",
+        "GBGGBBBBBBBG",
+        "GBGGBBBBBBBG",
+        "GBGGBBBBBBBG",
+        "GGGGGGGGGGGG",
+        "GBGGBBBBBBBG"
     };
 
     int result = twoPluses(grid);
