@@ -95,8 +95,7 @@ static int twoPluses(vector<string> grid) {
 
         int level(maxCrossing / 2);
         while (radius >= 0) {
-            vector<pair<int, int>> coords{ findCoord(grid, radius) };
-            --level;
+            vector<pair<int, int>> coords{ findCoord(grid, level) };
             // find cross
             for (const auto& [l, r] : coords) {
                 tempRad = findRadiusCross(grid, l, r, radius);
@@ -114,6 +113,7 @@ static int twoPluses(vector<string> grid) {
 
             if (numPoint == 2) break;
 
+            --level;
             --radius;
 
             if (cp[numPoint].radius >= radius) {
