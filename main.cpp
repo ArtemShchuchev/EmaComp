@@ -38,24 +38,16 @@ struct CrossPoint {
     int radius;
 };
 
-static void crossFill(vector<string>& grid, const CrossPoint cp) {
+static void crossFill(vector<string>& grid, const CrossPoint cp, const char ch) {
     int radius(cp.radius);
     while (radius) {
-        grid[cp.line - radius][cp.row] = 'O';
-        grid[cp.line][cp.row + radius] = 'O';
-        grid[cp.line + radius][cp.row] = 'O';
-        grid[cp.line][cp.row - radius] = 'O';
+        grid[cp.line - radius][cp.row] = ch;
+        grid[cp.line][cp.row + radius] = ch;
+        grid[cp.line + radius][cp.row] = ch;
+        grid[cp.line][cp.row - radius] = ch;
         --radius;
     }
-    grid[cp.line][cp.row] = 'O';
-}
-
-static void restoreMatrix(vector<string>& grid) {
-    for (auto& line : grid) {
-        for (auto& ch : line) {
-            if (ch == 'O') ch = 'G';
-        }
-    }
+    grid[cp.line][cp.row] = ch;
 }
 
 static int twoPluses(vector<string> grid) {
@@ -76,23 +68,12 @@ static int twoPluses(vector<string> grid) {
         int tempRad(0);
 
         while (radius >= 0) {
-            if (cp[numPoint].radius >= radius) {
-                if (numPoint) numPoint = 2;
-                else {
-                    crossFill(grid, cp[numPoint]);
-                    ++numPoint;
-                }
-
-                if (numPoint == 2) break;
-            }
-
             int lMin = radius;
             int rMin = radius;
             int lMax = sizeLine - lMin - 1;
             int rMax = sizeRow - rMin - 1;
 
             vector<pair<int, int>> coords;
-
             // horizontal
             for (int r(rMin); r <= rMax; ++r) {
                 coords.push_back({ lMin, r });
@@ -108,22 +89,29 @@ static int twoPluses(vector<string> grid) {
             // find cross
             for (const auto& [l, r] : coords) {
                 tempRad = findRadiusCross(grid, l, r, radius);
-                if (tempRad >= 0) {
-                    if (tempRad == radius) {
-                        cp[numPoint] = { l, r, tempRad };
-                        crossFill(grid, cp[numPoint]);
-                        ++numPoint;
-                    }
-                    else if (tempRad > cp[numPoint].radius) cp[numPoint] = { l, r, tempRad };
-                    if (numPoint == 2) break;
+                if (tempRad > cp[numPoint].radius) {
+                    cp[numPoint] = { l, r, tempRad };
+                }
+                
+                if (cp[numPoint].radius == radius) {
+                    ++numPoint;
+
+                    if (numPoint == 1) crossFill(grid, cp[0], 'O');
+                    else break;
                 }
             }
 
             if (numPoint == 2) break;
 
             --radius;
+
+            if (cp[numPoint].radius >= radius) {
+                if (numPoint >= 1) break;
+                crossFill(grid, cp[numPoint], 'O');
+                ++numPoint;
+            }
         }
-        restoreMatrix(grid);
+        crossFill(grid, cp[0], 'G');
 
         int square1 = cp[0].radius * 4 + 1;
         int square2 = cp[1].radius * 4 + 1;
