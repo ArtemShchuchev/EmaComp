@@ -50,6 +50,32 @@ static void crossFill(vector<string>& grid, const CrossPoint cp, const char ch) 
     grid[cp.line][cp.row] = ch;
 }
 
+static vector<pair<int, int>> findCoord(const vector<string>& grid, const int level) {
+    int sizeRow(static_cast<int>(grid[0].size()));
+    int sizeLine(static_cast<int>(grid.size()));
+
+    int lMin = level;
+    int rMin = level;
+    int lMax = sizeLine - lMin - 1;
+    int rMax = sizeRow - rMin - 1;
+
+    vector<pair<int, int>> coords;
+    // horizontal
+    for (int r(rMin); r <= rMax; ++r) {
+        coords.push_back({ lMin, r });
+        if (lMin != lMax) coords.push_back({ lMax, r });
+    }
+    // vertikal
+    ++lMin;
+    --lMax;
+    for (int l(lMin); l <= lMax; ++l) {
+        coords.push_back({ l, rMin });
+        if (rMin != rMax) coords.push_back({ l, rMax });
+    }
+
+    return coords;
+}
+
 static int twoPluses(vector<string> grid) {
     int sizeRow(static_cast<int>(grid[0].size()));
     int sizeLine(static_cast<int>(grid.size()));
@@ -67,25 +93,10 @@ static int twoPluses(vector<string> grid) {
         CrossPoint cp[2]{ {-1,-1,-1}, {-1,-1,-1} };
         int tempRad(0);
 
+        int level(maxCrossing / 2);
         while (radius >= 0) {
-            int lMin = radius;
-            int rMin = radius;
-            int lMax = sizeLine - lMin - 1;
-            int rMax = sizeRow - rMin - 1;
-
-            vector<pair<int, int>> coords;
-            // horizontal
-            for (int r(rMin); r <= rMax; ++r) {
-                coords.push_back({ lMin, r });
-                if (lMin != lMax) coords.push_back({ lMax, r });
-            }
-            // vertikal
-            ++lMin;
-            --lMax;
-            for (int l(lMin); l <= lMax; ++l) {
-                coords.push_back({ l, rMin });
-                if (rMin != rMax) coords.push_back({ l, rMax });
-            }
+            vector<pair<int, int>> coords{ findCoord(grid, radius) };
+            --level;
             // find cross
             for (const auto& [l, r] : coords) {
                 tempRad = findRadiusCross(grid, l, r, radius);
