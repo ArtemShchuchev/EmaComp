@@ -36,6 +36,17 @@ struct CrossPoint {
     int line;
     int row;
     int radius;
+
+    CrossPoint() : line(-1), row(-1), radius(-1) {}
+    CrossPoint(const int l, const int r, const int rad) : line(l), row(r), radius(rad) {}
+
+    CrossPoint* operator= (CrossPoint* cp) {
+        this->line = cp->line;
+        this->row = cp->row;
+        this->radius = cp->radius;
+
+        return this;
+    }
 };
 
 static void crossFill(vector<string>& grid, const CrossPoint cp, const char ch) {
@@ -69,7 +80,7 @@ static vector<vector<pair<int, int>>> findCoord(const vector<string>& grid) {
 
         // horizontal
         for (int r(rMin); r <= rMax; ++r) {
-            coordsOnLevel[level].push_back({lMin, r});
+            coordsOnLevel[level].push_back({ lMin, r });
             if (lMin != lMax) coordsOnLevel[level].push_back({ lMax, r });
         }
         // vertikal
@@ -96,7 +107,7 @@ static int twoPluses(vector<string> grid) {
         --testRad;
 
         int numPoint(0);
-        CrossPoint cp[2]{ {-1,-1,-1}, {-1,-1,-1} };
+        CrossPoint cp[2];
 
         int level(coordsOnLevel.size() - 1);
         while (radius >= 0) {
@@ -105,16 +116,13 @@ static int twoPluses(vector<string> grid) {
                 int tempRad = findRadiusCross(grid, l, r, radius);
                 if (tempRad > cp[numPoint].radius) {
                     cp[numPoint] = { l, r, tempRad };
-                }
                 
-                if (cp[numPoint].radius == radius) {
-                    ++numPoint;
-
-                    if (numPoint == 1) crossFill(grid, cp[0], 'O');
-                    else break;
+                    if (cp[numPoint].radius == radius) {
+                        if (++numPoint == 1) crossFill(grid, cp[0], 'O');
+                        else break;
+                    }
                 }
             }
-
             if (numPoint == 2) break;
 
             --level;
