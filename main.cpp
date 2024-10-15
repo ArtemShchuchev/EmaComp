@@ -50,55 +50,59 @@ static void crossFill(vector<string>& grid, const CrossPoint cp, const char ch) 
     grid[cp.line][cp.row] = ch;
 }
 
-static vector<pair<int, int>> findCoord(const vector<string>& grid, const int level) {
-    int sizeRow(static_cast<int>(grid[0].size()));
-    int sizeLine(static_cast<int>(grid.size()));
-
-    int lMin = level;
-    int rMin = level;
-    int lMax = sizeLine - lMin - 1;
-    int rMax = sizeRow - rMin - 1;
-
-    vector<pair<int, int>> coords;
-    // horizontal
-    for (int r(rMin); r <= rMax; ++r) {
-        coords.push_back({ lMin, r });
-        if (lMin != lMax) coords.push_back({ lMax, r });
-    }
-    // vertikal
-    ++lMin;
-    --lMax;
-    for (int l(lMin); l <= lMax; ++l) {
-        coords.push_back({ l, rMin });
-        if (rMin != rMax) coords.push_back({ l, rMax });
-    }
-
-    return coords;
-}
-
-static int twoPluses(vector<string> grid) {
+static vector<vector<pair<int, int>>> findCoord(const vector<string>& grid) {
     int sizeRow(static_cast<int>(grid[0].size()));
     int sizeLine(static_cast<int>(grid.size()));
 
     int minSize(min(sizeRow, sizeLine));
     int maxCrossing(minSize % 2 ? minSize : minSize - 1);
 
+    int level(maxCrossing / 2);
+
+    vector<vector<pair<int, int>>> coordsOnLevel(level+1);
+
+    while (level >= 0) {
+        int lMin = level;
+        int rMin = level;
+        int lMax = sizeLine - lMin - 1;
+        int rMax = sizeRow - rMin - 1;
+
+        // horizontal
+        for (int r(rMin); r <= rMax; ++r) {
+            coordsOnLevel[level].push_back({lMin, r});
+            if (lMin != lMax) coordsOnLevel[level].push_back({ lMax, r });
+        }
+        // vertikal
+        ++lMin;
+        --lMax;
+        for (int l(lMin); l <= lMax; ++l) {
+            coordsOnLevel[level].push_back({ l, rMin });
+            if (rMin != rMax) coordsOnLevel[level].push_back({ l, rMax });
+        }
+
+        --level;
+    }
+
+    return coordsOnLevel;
+}
+
+static int twoPluses(vector<string> grid) {
+    vector<vector<pair<int, int>>> coordsOnLevel{ findCoord(grid) };
+    int testRad(coordsOnLevel.size() - 1);
     vector<int> square;
-    int testRad(maxCrossing / 2);
+
     while (testRad > 1) {
         int radius(testRad);
         --testRad;
 
         int numPoint(0);
         CrossPoint cp[2]{ {-1,-1,-1}, {-1,-1,-1} };
-        int tempRad(0);
 
-        int level(maxCrossing / 2);
+        int level(coordsOnLevel.size() - 1);
         while (radius >= 0) {
-            vector<pair<int, int>> coords{ findCoord(grid, level) };
             // find cross
-            for (const auto& [l, r] : coords) {
-                tempRad = findRadiusCross(grid, l, r, radius);
+            for (const auto& [l, r] : coordsOnLevel[level]) {
+                int tempRad = findRadiusCross(grid, l, r, radius);
                 if (tempRad > cp[numPoint].radius) {
                     cp[numPoint] = { l, r, tempRad };
                 }
@@ -114,7 +118,7 @@ static int twoPluses(vector<string> grid) {
             if (numPoint == 2) break;
 
             --level;
-            --radius;
+            if (level < radius) radius = level;
 
             if (cp[numPoint].radius >= radius) {
                 if (numPoint >= 1) break;
@@ -130,9 +134,6 @@ static int twoPluses(vector<string> grid) {
         std::cout << square1 << " * " << square2 << " = " << square.back() << endl;
     }
 
-
-
-
     return *max_element(square.begin(), square.end());
 }
 
@@ -144,6 +145,16 @@ int main()
     std::system("cls");
 
 
+    vector<string> grid{ //81
+        "GGGGGGGG",
+        "GBGBGGBG",
+        "GBGBGGBG",
+        "GGGGGGGG",
+        "GBGBGGBG",
+        "GGGGGGGG",
+        "GBGBGGBG",
+        "GGGGGGGG"
+    };
     /*
     vector<string> grid{
         "BGBBGB",
@@ -161,17 +172,6 @@ int main()
         "GGGGGG"
     };
     vector<string> grid{ //81
-        "GGGGGGGG",
-        "GBGBGGBG",
-        "GBGBGGBG",
-        "GGGGGGGG",
-        "GBGBGGBG",
-        "GGGGGGGG",
-        "GBGBGGBG",
-        "GGGGGGGG"
-    };
-    */
-    vector<string> grid{ //81
         "GGGGGGGGGGGG",
         "GBGGBBBBBBBG",
         "GBGGBBBBBBBG",
@@ -185,6 +185,7 @@ int main()
         "GGGGGGGGGGGG",
         "GBGGBBBBBBBG"
     };
+    */
 
     int result = twoPluses(grid);
 
