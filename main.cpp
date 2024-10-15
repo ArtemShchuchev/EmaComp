@@ -99,7 +99,7 @@ static vector<vector<pair<int, int>>> findCoord(const vector<string>& grid) {
 
 static int twoPluses(vector<string> grid) {
     vector<vector<pair<int, int>>> coordsOnLevel{ findCoord(grid) };
-    int testRad(coordsOnLevel.size() - 1);
+    int testRad(static_cast<int>(coordsOnLevel.size() - 1));
     vector<int> square;
 
     while (testRad > 1) {
@@ -109,7 +109,7 @@ static int twoPluses(vector<string> grid) {
         int numPoint(0);
         CrossPoint cp[2];
 
-        int level(coordsOnLevel.size() - 1);
+        int level(static_cast<int>(coordsOnLevel.size() - 1));
         while (radius >= 0) {
             // find cross
             for (const auto& [l, r] : coordsOnLevel[level]) {
