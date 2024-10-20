@@ -2,6 +2,7 @@
 
 #include <iostream>
 #include <vector>
+#include <map>
 
 using namespace std;
 
@@ -46,6 +47,33 @@ struct CrossPoint {
         this->radius = cp->radius;
 
         return this;
+    }
+
+    bool crossing(const CrossPoint& cp) const{
+        bool answer(false);
+
+        int rowDistance(abs(row - cp.row) - 1);
+        int lineDistance(abs(line - cp.line) - 1);
+
+        if (line == cp.line) {
+            if (rowDistance < radius + cp.radius) answer = true;
+        }
+        else if (row == cp.row) {
+            if (lineDistance < radius + cp.radius) answer = true;
+        }
+        else {
+            int maxRad(max(radius, cp.radius));
+            int minRad(min(radius, cp.radius));
+
+            if (lineDistance < maxRad) {
+                if (rowDistance < minRad) answer = true;
+            }
+            else if (rowDistance < maxRad) {
+                if (lineDistance < minRad) answer = true;
+            }
+        }
+
+        return answer;
     }
 };
 
@@ -97,19 +125,64 @@ static vector<vector<pair<int, int>>> findCoord(const vector<string>& grid) {
     return coordsOnLevel;
 }
 
+
 static int twoPluses(vector<string> grid) {
+    vector<int> answer;
+    multimap<int, pair<int, int>> allCross;
     vector<vector<pair<int, int>>> coordsOnLevel{ findCoord(grid) };
-    int testRad(static_cast<int>(coordsOnLevel.size() - 1));
-    vector<int> square;
+    int level(static_cast<int>(coordsOnLevel.size() - 1));
+    while (level >= 0) {
+        for (const auto& [l, r] : coordsOnLevel[level]) {
+            int tempRad = findRadiusCross(grid, l, r, level);
+            if (tempRad >= 0) allCross.insert({ tempRad, {l, r} });
+        }
+        --level;
+    }
 
-    while (testRad > 1) {
-        int radius(testRad);
-        --testRad;
+    auto lastIter(prev(allCross.crend()));
+    for (auto it1(allCross.crbegin()); it1 != lastIter; ++it1) {
+        auto& [rad1, coord1] = *it1;
+        auto& [line1, row1] = coord1;
+        CrossPoint cp1(line1, row1, rad1);
+        //cout << line1 << ", " << row1 << " - " << rad1 << '\n';
+        //cout << "---------\n";
+        for (auto it2(allCross.crbegin()); it2 != allCross.crend(); ++it2) {
+            auto& [rad2, coord2] = *it2;
+            auto& [line2, row2] = coord2;
+            CrossPoint cp2(line2, row2, rad2);
 
+            if (it1 == it2) continue;
+            else if (*it1 > *it2) cp1.radius = cp2.radius;
+
+            if (!cp1.crossing(cp2)) {
+                int square1 = cp1.radius * 4 + 1;
+                int square2 = cp2.radius * 4 + 1;
+                answer.push_back(square1 * square2);
+                cout << "---------\n";
+                cout << line1 << ", " << row1 << " - " << rad1 << '\n';
+                cout << line2 << ", " << row2 << " - " << rad2 << '\n';
+                cout << "---------\n";
+                break;
+            }
+            //cout << line2 << ", " << row2 << " - " << rad2 << '\n';
+        }
+        //cout << "##################\n";
+    }
+
+    return *max_element(answer.begin(), answer.end());
+
+    /*
+    vector<int> answer;
+    vector<vector<pair<int, int>>> coordsOnLevel{ findCoord(grid) };
+    const int MAX_LEVEL(static_cast<int>(coordsOnLevel.size() - 1));
+
+    int findMaxRadius(MAX_LEVEL);
+    while (findMaxRadius > 1) {
         int numPoint(0);
         CrossPoint cp[2];
 
-        int level(static_cast<int>(coordsOnLevel.size() - 1));
+        int radius(findMaxRadius);
+        int level(findMaxRadius);
         while (radius >= 0) {
             // find cross
             for (const auto& [l, r] : coordsOnLevel[level]) {
@@ -125,7 +198,11 @@ static int twoPluses(vector<string> grid) {
             }
             if (numPoint == 2) break;
 
-            --level;
+            if (findMaxRadius < MAX_LEVEL && findMaxRadius <= level) {
+                if (level == MAX_LEVEL) level = findMaxRadius - 1;
+                else ++level;
+            }
+            else --level;
             if (level < radius) radius = level;
 
             if (cp[numPoint].radius >= radius) {
@@ -138,11 +215,14 @@ static int twoPluses(vector<string> grid) {
 
         int square1 = cp[0].radius * 4 + 1;
         int square2 = cp[1].radius * 4 + 1;
-        square.push_back(square1 * square2);
-        std::cout << square1 << " * " << square2 << " = " << square.back() << endl;
+        answer.push_back(square1 * square2);
+        std::cout << square1 << " * " << square2 << " = " << answer.back() << endl;
+        
+        --findMaxRadius;
     }
 
-    return *max_element(square.begin(), square.end());
+    return *max_element(answer.begin(), answer.end());
+    */
 }
 
 
@@ -153,7 +233,23 @@ int main()
     std::system("cls");
 
 
-    vector<string> grid{ //81
+    /*
+    vector<string> grid{ //5x6 - 5
+        "GGGGGG",
+        "GBBBGB",
+        "GGGGGG",
+        "GGBBGB",
+        "GGGGGG"
+    };
+    vector<string> grid{ //6x6 - 25
+        "BGBBGB",
+        "GGGGGG",
+        "BGBBGB",
+        "GGGGGG",
+        "BGBBGB",
+        "BGBBGB"
+    };
+    vector<string> grid{ //8x8 - 81
         "GGGGGGGG",
         "GBGBGGBG",
         "GBGBGGBG",
@@ -162,22 +258,6 @@ int main()
         "GGGGGGGG",
         "GBGBGGBG",
         "GGGGGGGG"
-    };
-    /*
-    vector<string> grid{
-        "BGBBGB",
-        "GGGGGG",
-        "BGBBGB",
-        "GGGGGG",
-        "BGBBGB",
-        "BGBBGB"
-    };
-    vector<string> grid{
-        "GGGGGG",
-        "GBBBGB",
-        "GGGGGG",
-        "GGBBGB",
-        "GGGGGG"
     };
     vector<string> grid{ //81
         "GGGGGGGGGGGG",
@@ -194,6 +274,22 @@ int main()
         "GBGGBBBBBBBG"
     };
     */
+    vector<string> grid{ //14x12 - 189
+        "GGGGGGGGGGGG",
+        "GGGGGGGGGGGG",
+        "BGBGGGBGBGBG",
+        "BGBGGGBGBGBG",
+        "GGGGGGGGGGGG",
+        "GGGGGGGGGGGG",
+        "GGGGGGGGGGGG",
+        "GGGGGGGGGGGG",
+        "BGBGGGBGBGBG",
+        "BGBGGGBGBGBG",
+        "BGBGGGBGBGBG",
+        "BGBGGGBGBGBG",
+        "GGGGGGGGGGGG",
+        "GGGGGGGGGGGG"
+    };
 
     int result = twoPluses(grid);
 
