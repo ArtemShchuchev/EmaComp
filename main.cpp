@@ -77,18 +77,6 @@ struct CrossPoint {
     }
 };
 
-static void crossFill(vector<string>& grid, const CrossPoint cp, const char ch) {
-    int radius(cp.radius);
-    while (radius) {
-        grid[cp.line - radius][cp.row] = ch;
-        grid[cp.line][cp.row + radius] = ch;
-        grid[cp.line + radius][cp.row] = ch;
-        grid[cp.line][cp.row - radius] = ch;
-        --radius;
-    }
-    grid[cp.line][cp.row] = ch;
-}
-
 static vector<vector<pair<int, int>>> findCoord(const vector<string>& grid) {
     int sizeRow(static_cast<int>(grid[0].size()));
     int sizeLine(static_cast<int>(grid.size()));
@@ -170,59 +158,6 @@ static int twoPluses(vector<string> grid) {
     }
 
     return *max_element(answer.begin(), answer.end());
-
-    /*
-    vector<int> answer;
-    vector<vector<pair<int, int>>> coordsOnLevel{ findCoord(grid) };
-    const int MAX_LEVEL(static_cast<int>(coordsOnLevel.size() - 1));
-
-    int findMaxRadius(MAX_LEVEL);
-    while (findMaxRadius > 1) {
-        int numPoint(0);
-        CrossPoint cp[2];
-
-        int radius(findMaxRadius);
-        int level(findMaxRadius);
-        while (radius >= 0) {
-            // find cross
-            for (const auto& [l, r] : coordsOnLevel[level]) {
-                int tempRad = findRadiusCross(grid, l, r, radius);
-                if (tempRad > cp[numPoint].radius) {
-                    cp[numPoint] = { l, r, tempRad };
-                
-                    if (cp[numPoint].radius == radius) {
-                        if (++numPoint == 1) crossFill(grid, cp[0], 'O');
-                        else break;
-                    }
-                }
-            }
-            if (numPoint == 2) break;
-
-            if (findMaxRadius < MAX_LEVEL && findMaxRadius <= level) {
-                if (level == MAX_LEVEL) level = findMaxRadius - 1;
-                else ++level;
-            }
-            else --level;
-            if (level < radius) radius = level;
-
-            if (cp[numPoint].radius >= radius) {
-                if (numPoint >= 1) break;
-                crossFill(grid, cp[numPoint], 'O');
-                ++numPoint;
-            }
-        }
-        crossFill(grid, cp[0], 'G');
-
-        int square1 = cp[0].radius * 4 + 1;
-        int square2 = cp[1].radius * 4 + 1;
-        answer.push_back(square1 * square2);
-        std::cout << square1 << " * " << square2 << " = " << answer.back() << endl;
-        
-        --findMaxRadius;
-    }
-
-    return *max_element(answer.begin(), answer.end());
-    */
 }
 
 
