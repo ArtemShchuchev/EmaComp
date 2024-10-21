@@ -1,6 +1,7 @@
 ﻿// https://www.hackerrank.com/challenges/two-pluses/problem?utm_campaign=challenge-recommendation&utm_medium=email&utm_source=24-hour-campaign
 
 #include <iostream>
+#include <fstream>
 #include <vector>
 #include <map>
 
@@ -167,80 +168,51 @@ int main()
     system("chcp 1251");            // настраиваем кодировку консоли
     std::system("cls");
 
+    vector<pair<int, vector<string>>> tests;
+    const std::string IN_FILE = "../tests.txt";
 
-    /*
-    vector<string> grid{ //5x6 - 5
-        "GGGGGG",
-        "GBBBGB",
-        "GGGGGG",
-        "GGBBGB",
-        "GGGGGG"
-    };
-    vector<string> grid{ //6x6 - 25
-        "BGBBGB",
-        "GGGGGG",
-        "BGBBGB",
-        "GGGGGG",
-        "BGBBGB",
-        "BGBBGB"
-    };
-    vector<string> grid{ //8x8 - 81
-        "GGGGGGGG",
-        "GBGBGGBG",
-        "GBGBGGBG",
-        "GGGGGGGG",
-        "GBGBGGBG",
-        "GGGGGGGG",
-        "GBGBGGBG",
-        "GGGGGGGG"
-    };
-    vector<string> grid{ //81
-        "GGGGGGGGGGGG",
-        "GBGGBBBBBBBG",
-        "GBGGBBBBBBBG",
-        "GGGGGGGGGGGG",
-        "GGGGGGGGGGGG",
-        "GGGGGGGGGGGG",
-        "GGGGGGGGGGGG",
-        "GBGGBBBBBBBG",
-        "GBGGBBBBBBBG",
-        "GBGGBBBBBBBG",
-        "GGGGGGGGGGGG",
-        "GBGGBBBBBBBG"
-    };
-    vector<string> grid{ //14x12 - 189
-        "GGGGGGGGGGGG",
-        "GGGGGGGGGGGG",
-        "BGBGGGBGBGBG",
-        "BGBGGGBGBGBG",
-        "GGGGGGGGGGGG",
-        "GGGGGGGGGGGG",
-        "GGGGGGGGGGGG",
-        "GGGGGGGGGGGG",
-        "BGBGGGBGBGBG",
-        "BGBGGGBGBGBG",
-        "BGBGGGBGBGBG",
-        "BGBGGGBGBGBG",
-        "GGGGGGGGGGGG",
-        "GGGGGGGGGGGG"
-    };
-    */
-    vector<string> grid{ //10x9 - 81
-        "BBBGBGBBB",
-        "BBBGBGBBB",
-        "BBBGBGBBB",
-        "GGGGGGGGG",
-        "BBBGBGBBB",
-        "BBBGBGBBB",
-        "GGGGGGGGG",
-        "BBBGBGBBB",
-        "BBBGBGBBB",
-        "BBBGBGBBB"
-    };
+    cout << "Чтение файла: \"" << IN_FILE << "\".\n";
+    std::ifstream file(IN_FILE);
+    if (file.is_open()) {
+        int line(0), answer(0);
+        while (file >> line >> answer) {
+            vector<string> test;
+            while (line) {
+                string str;
+                if (file >> str) {
+                    test.push_back(str);
+                }
+                else break;
+                --line;
+            }
+            if (file.good()) tests.push_back({ answer, test });
+            else break;
+        }
+        
+        if (file.bad())
+            std::cout << "Ошибка ввода-вывода при чтении файла!\n";
+        else if (file.eof())
+            std::cout << "Чтение успешно.\n";
+        else if (file.fail())
+            std::cout << "Неверный формат данных!\n";
+        
+        file.close();
+    }
+    else {
+        cout << "Нет такого файла!\n";
+    }
 
-    int result = twoPluses(grid);
+    for (const auto& [answer, data] : tests) {
+        cout << "\nМатрица...\n";
+        for (const auto& str : data) {
+            cout << '\t' << str << '\n';
+        }
+        cout << "Правильно: " << answer << '\n';
+        cout << "Решение  : ";
 
-    std::cout << result << "\n";
+        int result = twoPluses(data);
+        std::cout << result << "\n";
+    }
 
     return 0;
 }
