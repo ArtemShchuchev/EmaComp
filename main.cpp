@@ -65,11 +65,11 @@ struct CrossPoint {
             int maxRad(max(radius, cp.radius));
             int minRad(min(radius, cp.radius));
 
-            if (lineDistance < maxRad) {
-                if (rowDistance < minRad) answer = true;
+            if (lineDistance < minRad) {
+                if (rowDistance < maxRad) answer = true;
             }
-            else if (rowDistance < maxRad) {
-                if (lineDistance < minRad) answer = true;
+            else if (rowDistance < minRad) {
+                if (lineDistance < maxRad) answer = true;
             }
         }
 
@@ -158,10 +158,10 @@ static int twoPluses(vector<string> grid) {
                 int square1 = cp1.radius * 4 + 1;
                 int square2 = cp2.radius * 4 + 1;
                 answer.push_back(square1 * square2);
-                cout << "---------\n";
-                cout << line1 << ", " << row1 << " - " << rad1 << '\n';
-                cout << line2 << ", " << row2 << " - " << rad2 << '\n';
-                cout << "---------\n";
+                //cout << "---------\n";
+                //cout << line1 << ", " << row1 << " - " << rad1 << '\n';
+                //cout << line2 << ", " << row2 << " - " << rad2 << '\n';
+                //cout << "---------\n";
                 break;
             }
             //cout << line2 << ", " << row2 << " - " << rad2 << '\n';
@@ -273,7 +273,6 @@ int main()
         "GGGGGGGGGGGG",
         "GBGGBBBBBBBG"
     };
-    */
     vector<string> grid{ //14x12 - 189
         "GGGGGGGGGGGG",
         "GGGGGGGGGGGG",
@@ -289,6 +288,19 @@ int main()
         "BGBGGGBGBGBG",
         "GGGGGGGGGGGG",
         "GGGGGGGGGGGG"
+    };
+    */
+    vector<string> grid{ //10x9 - 81
+        "BBBGBGBBB",
+        "BBBGBGBBB",
+        "BBBGBGBBB",
+        "GGGGGGGGG",
+        "BBBGBGBBB",
+        "BBBGBGBBB",
+        "GGGGGGGGG",
+        "BBBGBGBBB",
+        "BBBGBGBBB",
+        "BBBGBGBBB"
     };
 
     int result = twoPluses(grid);
