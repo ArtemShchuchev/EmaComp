@@ -128,34 +128,55 @@ static int twoPluses(vector<string> grid) {
         --level;
     }
 
+    int count1(0);
     auto lastIter(prev(allCross.crend()));
     for (auto it1(allCross.crbegin()); it1 != lastIter; ++it1) {
         auto& [rad1, coord1] = *it1;
         auto& [line1, row1] = coord1;
         CrossPoint cp1(line1, row1, rad1);
-        //cout << line1 << ", " << row1 << " - " << rad1 << '\n';
+        //cout << count1 << ": " << line1 << ", " << row1 << " - " << rad1 << '\n';
         //cout << "---------\n";
+
+        int r1(cp1.radius);
+        int count2(0);
         for (auto it2(allCross.crbegin()); it2 != allCross.crend(); ++it2) {
             auto& [rad2, coord2] = *it2;
             auto& [line2, row2] = coord2;
             CrossPoint cp2(line2, row2, rad2);
 
+            /*
             if (it1 == it2) continue;
             else if (*it1 > *it2) cp1.radius = cp2.radius;
+
+
+            */
+            if (count1 == count2) continue;
+            else if (count1 < count2) cp2.radius = cp1.radius;
+
+            /*
+            if (count1 == count2) continue;
+            else if (count1 > count2) {
+                if (cp1.radius > 0) --cp1.radius;
+                cp2.radius = cp1.radius;
+            }
+            else cp1.radius = r1;
+            */
 
             if (!cp1.crossing(cp2)) {
                 int square1 = cp1.radius * 4 + 1;
                 int square2 = cp2.radius * 4 + 1;
                 answer.push_back(square1 * square2);
-                //cout << "---------\n";
-                //cout << line1 << ", " << row1 << " - " << rad1 << '\n';
-                //cout << line2 << ", " << row2 << " - " << rad2 << '\n';
-                //cout << "---------\n";
+                //cout << "*********\n";
+                //cout << count1 << ": " << line1 << ", " << row1 << " - " << rad1 << '\n';
+                //cout << count2 << ": " << line2 << ", " << row2 << " - " << rad2 << '\n';
+                //cout << "*********\n";
                 break;
             }
-            //cout << line2 << ", " << row2 << " - " << rad2 << '\n';
+            //cout << count2 << ": " << line2 << ", " << row2 << " - " << rad2 << '\n';
+            ++count2;
         }
         //cout << "##################\n";
+        ++count1;
     }
 
     return *max_element(answer.begin(), answer.end());
