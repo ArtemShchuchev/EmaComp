@@ -116,21 +116,26 @@ static vector<vector<pair<int, int>>> findCoord(const vector<string>& grid) {
 
 
 static int twoPluses(vector<string> grid) {
-    vector<int> answer;
     multimap<int, pair<int, int>> allCross;
     vector<vector<pair<int, int>>> coordsOnLevel{ findCoord(grid) };
     int level(static_cast<int>(coordsOnLevel.size() - 1));
     while (level >= 0) {
         for (const auto& [l, r] : coordsOnLevel[level]) {
             int tempRad = findRadiusCross(grid, l, r, level);
-            if (tempRad >= 0) allCross.insert({ tempRad, {l, r} });
+            if (tempRad >= 0) {
+                if (tempRad == 0 && allCross.count(0) > 0) continue;
+                    
+                allCross.insert({ tempRad, {l, r} });
+            }
         }
         --level;
     }
 
-    int count1(0);
-    auto lastIter(prev(allCross.crend()));
-    for (auto it1(allCross.crbegin()); it1 != lastIter; ++it1) {
+    vector<pair<int, pair<int, int>>> crossing(allCross.rbegin(), allCross.rend());
+
+    int answer(0);
+    auto lastIter(prev(crossing.cend()));
+    for (auto it1(crossing.cbegin()); it1 != lastIter; ++it1) {
         auto& [rad1, coord1] = *it1;
         auto& [line1, row1] = coord1;
         CrossPoint cp1(line1, row1, rad1);
@@ -138,34 +143,20 @@ static int twoPluses(vector<string> grid) {
         //cout << "---------\n";
 
         int r1(cp1.radius);
-        int count2(0);
-        for (auto it2(allCross.crbegin()); it2 != allCross.crend(); ++it2) {
+        for (auto it2(crossing.cbegin()); it2 != crossing.cend(); ++it2) {
             auto& [rad2, coord2] = *it2;
             auto& [line2, row2] = coord2;
             CrossPoint cp2(line2, row2, rad2);
 
-            /*
             if (it1 == it2) continue;
-            else if (*it1 > *it2) cp1.radius = cp2.radius;
-
-
-            */
-            if (count1 == count2) continue;
-            else if (count1 < count2) cp2.radius = cp1.radius;
-
-            /*
-            if (count1 == count2) continue;
-            else if (count1 > count2) {
+            else if (it1 > it2) {
                 if (cp1.radius > 0) --cp1.radius;
                 cp2.radius = cp1.radius;
             }
-            else cp1.radius = r1;
-            */
 
             if (!cp1.crossing(cp2)) {
-                int square1 = cp1.radius * 4 + 1;
-                int square2 = cp2.radius * 4 + 1;
-                answer.push_back(square1 * square2);
+                int square( (cp1.radius * 4 + 1) * (cp2.radius * 4 + 1) );
+                if (answer < square) answer = square;
                 //cout << "*********\n";
                 //cout << count1 << ": " << line1 << ", " << row1 << " - " << rad1 << '\n';
                 //cout << count2 << ": " << line2 << ", " << row2 << " - " << rad2 << '\n';
@@ -173,13 +164,12 @@ static int twoPluses(vector<string> grid) {
                 break;
             }
             //cout << count2 << ": " << line2 << ", " << row2 << " - " << rad2 << '\n';
-            ++count2;
+            cp1.radius = r1;
         }
         //cout << "##################\n";
-        ++count1;
     }
 
-    return *max_element(answer.begin(), answer.end());
+    return answer;
 }
 
 
