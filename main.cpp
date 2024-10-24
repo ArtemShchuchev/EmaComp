@@ -34,6 +34,8 @@ static int findRadiusCross(const vector<string>& grid, const unsigned long long 
     return radius;
 }
 
+
+///////////////////////////////////
 struct CrossPoint {
     int line;
     int row;
@@ -78,6 +80,111 @@ struct CrossPoint {
     }
 };
 
+static void findRadiusCross(const vector<string>& grid, CrossPoint& cp) {
+    int radius(-1);
+
+    if (grid[cp.line][cp.row] == 'G') {
+        ++radius;
+
+        while (++radius <= cp.radius) {
+            if (grid[cp.line - radius][cp.row] != 'G') break;
+            if (grid[cp.line][cp.row + radius] != 'G') break;
+            if (grid[cp.line + radius][cp.row] != 'G') break;
+            if (grid[cp.line][cp.row - radius] != 'G') break;
+        }
+
+        --radius;
+    }
+
+    cp.radius = radius;
+}
+
+static vector<CrossPoint> findCross(const vector<string>& grid) {
+    int sizeRow(static_cast<int>(grid[0].size()));
+    int sizeLine(static_cast<int>(grid.size()));
+
+    int minSize(min(sizeRow, sizeLine));
+    int maxCrossing(minSize % 2 ? minSize : minSize - 1);
+
+    int level(maxCrossing / 2);
+
+    vector<CrossPoint> cross;
+    auto findTest = [&grid, &cross](int l, int r, int rad) {
+        CrossPoint cp(l, r, rad);
+        findRadiusCross(grid, cp);
+        if (cp.radius >= 0)
+            if (cp.radius > 0 || cross.size() < 2)
+                cross.push_back(cp);
+        };
+
+    while (level >= 0) {
+        int lMin = level;
+        int rMin = level;
+        int lMax = sizeLine - lMin - 1;
+        int rMax = sizeRow - rMin - 1;
+
+        // horizontal
+        for (int r(rMin); r <= rMax; ++r) {
+            findTest(lMin, r, level);
+            if (lMin != lMax) findTest(lMax, r, level);
+        }
+        // vertikal
+        ++lMin;
+        --lMax;
+        for (int l(lMin); l <= lMax; ++l) {
+            findTest(l, rMin, level);
+            if (rMin != rMax) findTest(l, rMax, level);
+        }
+
+        --level;
+    }
+
+    return cross;
+}
+/*
+*/
+static int twoPluses(const vector<string>& grid) {
+    int answer(0);
+    vector<CrossPoint> crossing{ findCross(grid) };
+    /*
+    for (const auto& cp : crossing) {
+        cout << cp.line << ", " << cp.row << " - " << cp.radius << '\n';
+    }
+    */
+
+    for (auto it1(crossing.begin()); it1 != crossing.cend(); ++it1) {
+        //cout << it1->line << ", " << it1->row << " - " << it1->radius << '\n';
+        //cout << "---------\n";
+
+        int r1(it1->radius);
+        for (auto it2(crossing.begin()); it2 != crossing.end(); ++it2) {
+
+            if (it1 == it2) continue;
+            else if (it1 > it2) {
+                if (it1->radius > 0) --it1->radius;
+                it2->radius = it1->radius;
+            }
+
+            if (!it1->crossing(*it2)) {
+                int square((it1->radius * 4 + 1) * (it2->radius * 4 + 1));
+                if (answer < square) answer = square;
+                //cout << "*********\n";
+                //cout << it1->line << ", " << it1->row << " - " << it1->radius << '\n';
+                //cout << it2->line << ", " << it2->row << " - " << it2->radius << '\n';
+                //cout << "*********\n";
+                break;
+            }
+            //cout << it2->line << ", " << it2->row << " - " << it2->radius << '\n';
+            it1->radius = r1;
+        }
+        //cout << "##################\n";
+    }
+
+    return answer;
+}
+///////////////////////////////////
+
+
 static vector<vector<pair<int, int>>> findCoord(const vector<string>& grid) {
     int sizeRow(static_cast<int>(grid[0].size()));
     int sizeLine(static_cast<int>(grid.size()));
@@ -114,7 +221,7 @@ static vector<vector<pair<int, int>>> findCoord(const vector<string>& grid) {
     return coordsOnLevel;
 }
 
-
+/*
 static int twoPluses(vector<string> grid) {
     multimap<int, pair<int, int>> allCross;
     vector<vector<pair<int, int>>> coordsOnLevel{ findCoord(grid) };
@@ -171,6 +278,7 @@ static int twoPluses(vector<string> grid) {
 
     return answer;
 }
+*/
 
 
 int main()
