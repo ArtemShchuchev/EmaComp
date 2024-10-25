@@ -78,6 +78,44 @@ struct CrossPoint {
 
         return answer;
     }
+
+    int maxCrossing(const CrossPoint& cp) const {
+        auto crossing = [this, &cp](int rad1, int rad2) {
+                int rowDistance(abs(row - cp.row) - 1);
+                int lineDistance(abs(line - cp.line) - 1);
+                bool answer(false);
+                if (line == cp.line) {
+                    if (rowDistance < rad1 + rad2) answer = true;
+                }
+                else if (row == cp.row) {
+                    if (lineDistance < rad1 + rad2) answer = true;
+                }
+                else {
+                    int maxRad(max(rad1, rad2));
+                    int minRad(min(rad1, rad2));
+
+                    if (lineDistance < minRad) {
+                        if (rowDistance < maxRad) answer = true;
+                    }
+                    else if (rowDistance < minRad) {
+                        if (lineDistance < maxRad) answer = true;
+                    }
+                }
+                return answer;
+            };
+
+        int square(0);
+        for (int r1(0); r1 <= radius; ++r1) {
+            for (int r2(0); r2 <= cp.radius; ++r2) {
+                if (!crossing(r1, r2)) {
+                    int temp((r1 * 4 + 1) * (r2 * 4 + 1));
+                    if (square < temp) square = temp;
+                }
+            }
+        }
+
+        return square;
+    }
 };
 
 static void findRadiusCross(const vector<string>& grid, CrossPoint& cp) {
@@ -141,43 +179,18 @@ static vector<CrossPoint> findCross(const vector<string>& grid) {
 
     return cross;
 }
-/*
-*/
+
 static int twoPluses(const vector<string>& grid) {
     int answer(0);
     vector<CrossPoint> crossing{ findCross(grid) };
-    /*
-    for (const auto& cp : crossing) {
-        cout << cp.line << ", " << cp.row << " - " << cp.radius << '\n';
-    }
-    */
 
     for (auto it1(crossing.begin()); it1 != crossing.cend(); ++it1) {
-        //cout << it1->line << ", " << it1->row << " - " << it1->radius << '\n';
-        //cout << "---------\n";
-
-        int r1(it1->radius);
         for (auto it2(crossing.begin()); it2 != crossing.end(); ++it2) {
-
             if (it1 == it2) continue;
-            else if (it1 > it2) {
-                if (it1->radius > 0) --it1->radius;
-                it2->radius = it1->radius;
-            }
 
-            if (!it1->crossing(*it2)) {
-                int square((it1->radius * 4 + 1) * (it2->radius * 4 + 1));
-                if (answer < square) answer = square;
-                //cout << "*********\n";
-                //cout << it1->line << ", " << it1->row << " - " << it1->radius << '\n';
-                //cout << it2->line << ", " << it2->row << " - " << it2->radius << '\n';
-                //cout << "*********\n";
-                break;
-            }
-            //cout << it2->line << ", " << it2->row << " - " << it2->radius << '\n';
-            it1->radius = r1;
+            int square(it1->maxCrossing(*it2));
+            if (answer < square) answer = square;
         }
-        //cout << "##################\n";
     }
 
     return answer;
